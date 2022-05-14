@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -18,7 +16,7 @@ class _BottomTabsState extends State<BottomTabs> {
 
   @override
   Widget build(BuildContext context) {
-    _selectedTab = widget.selectedTab ?? 0;
+    _selectedTab = widget.selectedTab;
 
     return Container(
       decoration: BoxDecoration(
