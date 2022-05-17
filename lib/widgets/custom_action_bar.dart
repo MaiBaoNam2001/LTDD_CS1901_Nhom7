@@ -6,24 +6,28 @@ class CustomActionBar extends StatelessWidget {
   final String title;
   final bool hasBackArrow;
   final bool hasTitle;
+  final bool hasBackground;
 
   const CustomActionBar(
       {required this.title,
       required this.hasBackArrow,
-      required this.hasTitle});
+      required this.hasTitle,
+      required this.hasBackground});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white,
-            Colors.white.withOpacity(0),
-          ],
-          begin: const Alignment(0, 0),
-          end: const Alignment(0, 1),
-        ),
+        gradient: hasBackground
+            ? LinearGradient(
+                colors: [
+                  Colors.white,
+                  Colors.white.withOpacity(0),
+                ],
+                begin: const Alignment(0, 0),
+                end: const Alignment(0, 1),
+              )
+            : null,
       ),
       padding: const EdgeInsets.only(
         top: 56.0,

@@ -16,6 +16,7 @@ class SavedTab extends StatelessWidget {
             title: 'Saved',
             hasBackArrow: false,
             hasTitle: true,
+            hasBackground: false,
           ),
         ],
       ),
