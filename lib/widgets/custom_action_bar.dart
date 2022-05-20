@@ -1,4 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce_app/services/firebase_services.dart';
 import 'package:ecommerce_app/styles.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -8,11 +11,13 @@ class CustomActionBar extends StatelessWidget {
   final bool hasTitle;
   final bool hasBackground;
 
-  const CustomActionBar(
+  CustomActionBar(
       {required this.title,
       required this.hasBackArrow,
       required this.hasTitle,
       required this.hasBackground});
+
+  FirebaseServives firebaseServives = FirebaseServives();
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +44,22 @@ class CustomActionBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           if (hasBackArrow)
-            Container(
-              width: 42.0,
-              height: 42.0,
-              decoration: BoxDecoration(
-                color: Colors.black,
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              alignment: Alignment.center,
-              child: const Icon(
-                Ionicons.chevron_back,
-                color: Colors.white,
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: 42.0,
+                height: 42.0,
+                decoration: BoxDecoration(
+                  color: Colors.black,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                alignment: Alignment.center,
+                child: const Icon(
+                  Ionicons.chevron_back,
+                  color: Colors.white,
+                ),
               ),
             ),
           if (hasTitle)
@@ -65,13 +75,27 @@ class CustomActionBar extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.0),
             ),
             alignment: Alignment.center,
-            child: const Text(
-              "0",
-              style: TextStyle(
-                fontSize: 18.0,
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
-              ),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: firebaseServives.usersReference
+                  .doc(firebaseServives.getUserId())
+                  .collection("Cart")
+                  .snapshots(),
+              builder: (context, snapshot) {
+                int totalItems = 0;
+
+                if (snapshot.connectionState == ConnectionState.active) {
+                  List documents = snapshot.data!.docs;
+                  totalItems = documents.length;
+                }
+                return Text(
+                  "$totalItems",
+                  style: const TextStyle(
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white,
+                  ),
+                );
+              },
             ),
           )
         ],

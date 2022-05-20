@@ -91,7 +91,7 @@ class HomeTab extends StatelessWidget {
               );
             },
           ),
-          const CustomActionBar(
+          CustomActionBar(
             title: 'Home',
             hasBackArrow: false,
             hasTitle: true,

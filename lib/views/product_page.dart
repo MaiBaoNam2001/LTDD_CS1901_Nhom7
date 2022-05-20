@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ecommerce_app/services/firebase_services.dart';
 import 'package:ecommerce_app/styles.dart';
 import 'package:ecommerce_app/widgets/custom_action_bar.dart';
 import 'package:ecommerce_app/widgets/image_swipe.dart';
 import 'package:ecommerce_app/widgets/product_size.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
@@ -16,8 +18,20 @@ class ProductPage extends StatefulWidget {
 }
 
 class _ProductPageState extends State<ProductPage> {
-  final CollectionReference productsReference =
-      FirebaseFirestore.instance.collection("Products");
+  FirebaseServives firebaseServives = FirebaseServives();
+
+  final SnackBar snackBar =
+      const SnackBar(content: Text("Product added to cart"));
+
+  String selectProductSize = "S";
+
+  Future addToCart() {
+    return firebaseServives.usersReference
+        .doc(firebaseServives.getUserId())
+        .collection("Cart")
+        .doc(widget.productId)
+        .set({"size": selectProductSize});
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +39,8 @@ class _ProductPageState extends State<ProductPage> {
       body: Stack(
         children: [
           FutureBuilder(
-            future: productsReference.doc(widget.productId).get(),
+            future:
+                firebaseServives.productsReference.doc(widget.productId).get(),
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Scaffold(
@@ -42,8 +57,9 @@ class _ProductPageState extends State<ProductPage> {
                 List imageList = documentData["images"];
                 List selectSizeList = documentData["size"];
 
+                selectProductSize = selectSizeList[0];
+
                 return ListView(
-                  // padding: EdgeInsets.all(0),
                   children: [
                     ImageSwipe(imageList: imageList),
                     Padding(
@@ -94,7 +110,12 @@ class _ProductPageState extends State<ProductPage> {
                         style: Styles.regularDarkText,
                       ),
                     ),
-                    ProductSize(selectSizeList: selectSizeList),
+                    ProductSize(
+                      selectSizeList: selectSizeList,
+                      onSelected: (size) {
+                        selectProductSize = size;
+                      },
+                    ),
                     Padding(
                       padding: const EdgeInsets.only(
                         top: 42.0,
@@ -115,22 +136,30 @@ class _ProductPageState extends State<ProductPage> {
                             child: const Icon(Ionicons.bookmark_outline),
                           ),
                           Expanded(
-                            child: Container(
-                              margin: const EdgeInsets.only(
-                                left: 16.0,
-                              ),
-                              height: 65.0,
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(12.0),
-                              ),
-                              child: const Text(
-                                "Add To Cart",
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
+                            child: GestureDetector(
+                              onTap: () async {
+                                await addToCart();
+                                // ignore: use_build_context_synchronously
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(
+                                  left: 16.0,
+                                ),
+                                height: 65.0,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: Colors.black,
+                                  borderRadius: BorderRadius.circular(12.0),
+                                ),
+                                child: const Text(
+                                  "Add To Cart",
+                                  style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
@@ -149,7 +178,7 @@ class _ProductPageState extends State<ProductPage> {
               );
             },
           ),
-          const CustomActionBar(
+          CustomActionBar(
             title: "",
             hasBackArrow: true,
             hasTitle: false,

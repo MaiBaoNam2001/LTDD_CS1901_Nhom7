@@ -8,7 +8,7 @@ class SavedTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Stack(
-        children: const [
+        children: [
           Center(
             child: Text("Saved Tab"),
           ),
