@@ -5,6 +5,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ionicons/ionicons.dart';
 
+import '../views/cart_page.dart';
+
 class CustomActionBar extends StatelessWidget {
   final String title;
   final bool hasBackArrow;
@@ -67,35 +69,44 @@ class CustomActionBar extends StatelessWidget {
               title,
               style: Styles.boldHeading,
             ),
-          Container(
-            width: 42.0,
-            height: 42.0,
-            decoration: BoxDecoration(
-              color: Colors.black,
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            alignment: Alignment.center,
-            child: StreamBuilder<QuerySnapshot>(
-              stream: firebaseServives.usersReference
-                  .doc(firebaseServives.getUserId())
-                  .collection("Cart")
-                  .snapshots(),
-              builder: (context, snapshot) {
-                int totalItems = 0;
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CartPage(),
+                  ));
+            },
+            child: Container(
+              width: 42.0,
+              height: 42.0,
+              decoration: BoxDecoration(
+                color: Colors.black,
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              alignment: Alignment.center,
+              child: StreamBuilder<QuerySnapshot>(
+                stream: firebaseServives.usersReference
+                    .doc(firebaseServives.getUserId())
+                    .collection("Cart")
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  int totalItems = 0;
 
-                if (snapshot.connectionState == ConnectionState.active) {
-                  List documents = snapshot.data!.docs;
-                  totalItems = documents.length;
-                }
-                return Text(
-                  "$totalItems",
-                  style: const TextStyle(
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                );
-              },
+                  if (snapshot.connectionState == ConnectionState.active) {
+                    List documents = snapshot.data!.docs;
+                    totalItems = documents.length;
+                  }
+                  return Text(
+                    "$totalItems",
+                    style: const TextStyle(
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                    ),
+                  );
+                },
+              ),
             ),
           )
         ],
