@@ -20,8 +20,10 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   FirebaseServives firebaseServives = FirebaseServives();
 
-  final SnackBar snackBar =
+  final SnackBar snackBarCart =
       const SnackBar(content: Text("Product added to cart"));
+  final SnackBar snackBarSaved =
+      const SnackBar(content: Text("Product added to saved"));
 
   String selectProductSize = "S";
 
@@ -29,6 +31,14 @@ class _ProductPageState extends State<ProductPage> {
     return firebaseServives.usersReference
         .doc(firebaseServives.getUserId())
         .collection("Cart")
+        .doc(widget.productId)
+        .set({"size": selectProductSize});
+  }
+
+  Future addToSaved() {
+    return firebaseServives.usersReference
+        .doc(firebaseServives.getUserId())
+        .collection("Saved")
         .doc(widget.productId)
         .set({"size": selectProductSize});
   }
@@ -125,15 +135,23 @@ class _ProductPageState extends State<ProductPage> {
                       ),
                       child: Row(
                         children: [
-                          Container(
-                            width: 65.0,
-                            height: 65.0,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFDCDCDC),
-                              borderRadius: BorderRadius.circular(12.0),
+                          GestureDetector(
+                            onTap: () async {
+                              await addToSaved();
+                              // ignore: use_build_context_synchronously
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(snackBarSaved);
+                            },
+                            child: Container(
+                              width: 65.0,
+                              height: 65.0,
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFDCDCDC),
+                                borderRadius: BorderRadius.circular(12.0),
+                              ),
+                              child: const Icon(Ionicons.bookmark_outline),
                             ),
-                            child: const Icon(Ionicons.bookmark_outline),
                           ),
                           Expanded(
                             child: GestureDetector(
@@ -141,7 +159,7 @@ class _ProductPageState extends State<ProductPage> {
                                 await addToCart();
                                 // ignore: use_build_context_synchronously
                                 ScaffoldMessenger.of(context)
-                                    .showSnackBar(snackBar);
+                                    .showSnackBar(snackBarCart);
                               },
                               child: Container(
                                 margin: const EdgeInsets.only(
