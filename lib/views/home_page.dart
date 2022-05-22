@@ -48,7 +48,7 @@ class _HomePageState extends State<HomePage> {
                 },
                 children: [
                   HomeTab(),
-                  const SearchTab(),
+                  SearchTab(),
                   const SavedTab(),
                   const UserTab(),
                 ],
